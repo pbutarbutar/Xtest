@@ -1,0 +1,57 @@
+<?php  
+// We'll use PHP's session handling to keep track of the server-generated key  
+  
+session_start();  
+  
+// Function to generate a random key.  
+// Modified from code found at: http://www.totallyphp.co.uk/code/create_a_random_password.htm  
+  
+function randomString($length) {  
+    $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";  
+    $str = NULL;  
+    $i = 0;  
+    while ($i < $length) {  
+        $num = rand(0, 61);  
+        $tmp = substr($chars, $num, 1);  
+        $str .= $tmp;  
+        $i++;  
+    }  
+    return $str;  
+}  
+  
+// Call the function and set the shared key  
+  
+$key = $_SESSION['key'] = randomString(20);  
+?>  
+
+<html>  
+  <head>  
+    <!-- JavaScript that contains the functions which perform the actual hashing -->  
+    <script type="text/javascript" src="http://pajhome.org.uk/crypt/md5/sha1.js"></script>  
+  
+    <!-- The following function creates the hash of the concatenated key and password hash  
+and submits the content to the server via a form -->  
+    <script type="text/javascript">  
+    function login() {  
+        var p = hex_sha1(document.getElementById('pass').value);  
+        var k = document.getElementById('key').value;  
+        var h = hex_sha1(k+p);  
+        var hash = document.getElementById('hash');  
+        hash.value = h;  
+        var f = document.getElementById('finalform');  
+        alert(p);
+        f.submit();  
+    }  
+    </script>  
+  </head>  
+  <body>  
+    <form action="javascript:login()" method="post" >  
+    <input type="hidden" id="key" value="<?php echo $key; ?>" />  
+    <input type="password" id="pass" />  
+    <input type="submit" value="Submit" />  
+    </form>  
+    <form action="login.php" method="post" id="finalform">  
+    <input type="hidden" name="hash" id="hash" />  
+    </form>  
+  </body>  
+</html> 
